@@ -25,3 +25,23 @@ describe('App component', () => {
       expect(image).toBeInTheDocument();
     });
 });
+
+describe('App component', () => {
+  test('renders 2 input elements', () => {
+    render(<App />);
+    const inputs = screen.getAllByRole('textbox'); // 'email' and 'password' fields
+    const inputElements = screen.getAllByRole('textbox').concat(screen.getAllByLabelText(/password/i));
+    expect(inputElements.length).toBe(2);
+  });
+
+  test('renders 2 label elements with text Email and Password', () => {
+    render(<App />);
+    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+  });
+
+  test('renders a button with text OK', () => {
+    render(<App />);
+    expect(screen.getByRole('button', { name: /ok/i })).toBeInTheDocument();
+  });
+});
