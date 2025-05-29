@@ -4,12 +4,45 @@ import Notifications from '../Notifications/Notifications';
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
 import Login from '../Login/Login';
+import PropTypes from 'prop-types';
 import CourseList from '../CourseList/CourseList';
 import { getLatestNotification } from '../utils/utils';
+import BodySection from '../BodySection/BodySection';
+import BodySectionWithMarginBottom from '../BodySection/BodySectionWithMarginBottom';
 
 class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+  }
+
+  static defaultProps = {
+    logOut: () => {},
+    isLoggedIn: false
+  };
+
+  static propTypes = {
+    logOut: PropTypes.func,
+    isLoggedIn: PropTypes.bool
+  };
+
+  componentDidMount() {
+    document.addEventListener('keydown', this.handleKeyDown);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleKeyDown);
+  }
+
+  handleKeyDown(e) {
+    if (e.ctrlKey && e.key === 'h') {
+      alert('Logging you out');
+      this.props.logOut();
+    }
+  }
+
   render() {
-    const isLoggedIn = false; // change to true for testing CourseList display
+    const { isLoggedIn } = this.props;
 
     const notificationsList = [
       { id: 1, type: 'urgent', value: 'New course available' },
@@ -24,14 +57,25 @@ class App extends React.Component {
     ];
 
     return (
-      <React.Fragment>
+      <>
         <div className='root-notifications'>
           <Notifications notifications={notificationsList} />
         </div>
         <Header />
-        {isLoggedIn ? <CourseList courses={coursesList} /> : <Login />}
+        {isLoggedIn ? (
+          <BodySectionWithMarginBottom title="Course list">
+            <CourseList courses={coursesList} />
+          </BodySectionWithMarginBottom>
+        ) : (
+          <BodySectionWithMarginBottom title="Log in to continue">
+            <Login />
+          </BodySectionWithMarginBottom>
+        )}
+        <BodySection title="News from the School">
+          <p>Holberton School News goes here</p>
+        </BodySection>
         <Footer />
-      </React.Fragment>
+      </>
     );
   }
 }
