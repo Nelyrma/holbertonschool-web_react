@@ -2,58 +2,60 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, css } from 'aphrodite';
 
+function CourseListRow({ isHeader, textFirstCell, textSecondCell }) {
+    let content;
+    const bg = {
+        backgroundColor: isHeader ? '#deb5b545': '#f5f5f5ab'
+    };
+    
+    if (isHeader) {
+        if (!textSecondCell) {
+            content = (<th className={css(styles.firstTr, styles.th)} colSpan={2}>{textFirstCell}</th>)
+        } else {
+            content = (
+                <>
+                    <th className={css(styles.th)}>{textFirstCell}</th>
+                    <th className={css(styles.th)}>{textSecondCell}</th>
+                </>
+            );
+        }
+    } else {
+        content = (
+            <>
+                <td>{textFirstCell}</td>
+                <td>{textSecondCell}</td>
+            </>
+        );
+    }
+    return (
+        <tr style={bg}>
+            {content}
+        </tr>
+    );
+}
 
 CourseListRow.propTypes = {
-  isHeader: PropTypes.bool,
-  textFirstCell: PropTypes.string.isRequired,
-  textSecondCell: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-}
+    isHeader: PropTypes.bool,
+    textFirstCell: PropTypes.string.isRequired,
+    textSecondCell: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
+    ])
+};
 
-function CourseListRow({ isHeader = false, textFirstCell, textSecondCell }) {
-  const rowStyle = {
-    backgroundColor: isHeader ? '#deb5b545' : '#f5f5f5ab'
-  };
-
-  if (isHeader) {
-    return (
-      <tr style={rowStyle}>
-        {textSecondCell ? (
-          <>
-            <th className={css(styles.CourseListRow)}>{textFirstCell}</th>
-            <th className={css(styles.CourseListRow)}>{textSecondCell}</th>
-          </>
-        ) : (
-          <th className={css(styles.CourseListRow_title)} colSpan="2">{textFirstCell}</th>
-        )}
-      </tr>
-    );
-  } else {
-    return (
-      <tr style={rowStyle}>
-        <td>{textFirstCell}</td>
-        <td>{textSecondCell}</td>
-      </tr>
-    );
-  }
-}
+CourseListRow.defaultProps = {
+    isHeader: false,
+    textSecondCell: null
+};
 
 const styles = StyleSheet.create({
-  CourseListRow_title: {
-    borderBottom: "3px solid lightgray",
-    textAlign: "center",
-    fontWeight: "bolder",
-    fontSize: "x-large",
-    padding: "10px 0",
-  },
-
-  CourseListRow: {
-    borderBottom: "3px solid lightgray",
-    textAlign: "start",
-    fontWeight: "bolder",
-    fontSize: "larger",
-    padding: "5px 0",
-  },
+    firstTr: {
+        textAlign: 'center'
+    },
+    th: {
+        padding: '.4rem 0',
+        borderBottom: 'solid 2px rgb(227, 220, 220)'
+    }
 });
-
 
 export default CourseListRow;

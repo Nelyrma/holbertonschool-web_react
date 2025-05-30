@@ -1,51 +1,47 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import CourseListRow from './CourseListRow';
 import CourseShape from './CourseShape';
+import CourseListRow from './CourseListRow';
 import { StyleSheet, css } from 'aphrodite';
 
+function CourseList({ listCourses }) {
+    let content;
 
-CourseList.defaultProps = {
-    listCourses: [],
-}
-
-function CourseList({ isLoggedIn, listCourses }) {
-    CourseList.propTypes = {
-        isLoggedIn: PropTypes.bool.isRequired,
-        listCourses: PropTypes.arrayOf(CourseShape),
-    };
+    if (listCourses.length === 0) content = <CourseListRow textFirstCell='No course available yet' isHeader={false} />;
+    else {
+        content = listCourses.map((course) =>
+            <CourseListRow key={course.id} textFirstCell={course.name} textSecondCell={course.credit} isHeader={false}/>
+        );
+    }
 
     return (
-        <table className={css(styles.CourseList)} id="CourseList">
-            <thead >
-                <CourseListRow textFirstCell="Available courses" isHeader={true} />
-                <CourseListRow textFirstCell="Course name" textSecondCell="Credit" isHeader={true} />
+        <table className={css(styles.courseList)} id="CourseList">
+            <thead>
+                <CourseListRow className={css(styles.firstRow, styles.th)} textFirstCell="Available courses" isHeader={true}/>
+                <CourseListRow textFirstCell="Course name" textSecondCell="Credit" isHeader={true}/>
             </thead>
             <tbody>
-                {listCourses && listCourses.length > 0 ? (listCourses.map((course, index) => (
-                    <CourseListRow
-                    key={index}
-                    textFirstCell={course.name}
-                    textSecondCell={course.credit.toString()} />
-
-                ))
-                ) : (
-                    < CourseListRow textFirstCell="No course available yet" />
-                )}
+                {content}
             </tbody>
         </table>
     );
+}
+
+CourseList.propTypes = {
+    listCourses: PropTypes.arrayOf(CourseShape)
+};
+
+CourseList.defaultProps = {
+    listCourses: []
 };
 
 const styles = StyleSheet.create({
-    CourseList: {
-        border: "1px solid lightgray",
-        fontSize: "large",
-        margin : "0 auto",
-        width: "90%",
-        marginTop: "20px",
+    courseList: {
+        border: 'solid 1px rgb(227, 220, 220)',
+        width: '100%',
+        textAlign: 'left'
     },
-  });
-
+    
+});
 
 export default CourseList;

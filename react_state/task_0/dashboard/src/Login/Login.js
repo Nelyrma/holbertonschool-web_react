@@ -1,41 +1,33 @@
-import React from 'react';
+import React from "react";
 import { StyleSheet, css } from 'aphrodite';
 
-function App() {
-  return (
-    <>
-      <div className={css(styles['App-body'])}>
-        <p>Login to access the full dashboard</p>
-        <div className={css(styles['App-body-notification-container'])}>
-          <label htmlFor="email">Email:</label>
-          <input type="email" id="email" />
-          <label htmlFor="password">Password:</label>
-          <input type="password" id="password" />
-          <button>OK</button>
-        </div>
-      </div>
-    </>
-  );
+export default function Login(props) {
+    return (
+        <>
+            <p>{props.text}</p>
+            <div className={css(styles.small, styles.inline)}>
+                <label htmlFor="email">Email:</label>
+                <input type="email" id="email" name="email" className={css(styles.maringRight)}></input>
+            </div>
+            <div className={css(styles.small, styles.inline)}>
+                <label htmlFor="password">Password:</label>
+                <input type="password" id="password" name="password" className={css(styles.maringRight)}></input>
+            </div> 
+            <button type='button'>OK</button>
+        </>
+    );
 }
 
 const styles = StyleSheet.create({
-  'App-body': {
-    padding: '10px',
-  },
-  'App-body-notification-container': {
-    flexGrow: 1,
-    gap: '15px',
-    display: 'flex',
-    flexDirection: 'row',
-    '@media (max-width: 600px)': {
-      flexDirection: 'column',
-      alignItems: 'flex-start',
-      button: {
-        display: 'inline-block',
-      },
+    maringRight: {
+        marginRight: '1rem'
     },
-  },
+    inline: {
+        display: 'inline-block'
+    },
+    small: {
+        '@media (max-width: 900px)': {
+            display: 'block',
+        }
+    }
 });
-
-export default App;
-

@@ -1,31 +1,18 @@
-import React from 'react';
+import React from "react";
 import { shallow } from 'enzyme';
-import CourseListRow from './CourseListRow';
-import { StyleSheetTestUtils } from 'aphrodite';
+import CourseListRow from "./CourseListRow";
 
-describe('CourseListRow Component', () => {
-    beforeAll(() => {
-        StyleSheetTestUtils.suppressStyleInjection();
-      });
-
-      afterAll(() => {
-        StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
-      });
-
-    it('renders one cell with colspan = 2 when textSecondCell does not exist (isHeader=true)', () => {
-        const wrapper = shallow(<CourseListRow isHeader={true} textFirstCell="Header" />);
-        expect(wrapper.find('th')).toHaveLength(1);
-        expect(wrapper.find('th').prop('colSpan')).toEqual('2');
+describe('Tests the CourseListRow component', () => {
+    it('Tests that the component renders one cell with colspan = 2 when textSecondCell does not exist', () => {
+        const wrapper = shallow(<CourseListRow isHeader={true} textFirstCell={'Test'}/>);
+        expect(wrapper.find('th[colSpan=2]')).toHaveLength(1);
     });
-
-    it('renders two cells when textSecondCell is present (isHeader=true)', () => {
-        const wrapper = shallow(<CourseListRow isHeader={true} textFirstCell="Header" textSecondCell="Second Header" />);
+    it('Tests that the component renders two cells when textSecondCell is present', () => {
+        const wrapper = shallow(<CourseListRow isHeader={true} textFirstCell={'Test'} textSecondCell={'Test'}/>);
         expect(wrapper.find('th')).toHaveLength(2);
     });
-
-    it('renders correctly two td elements within a tr element (isHeader=false)', () => {
-        const wrapper = shallow(<CourseListRow isHeader={false} textFirstCell="Row" textSecondCell="Data" />);
-        expect(wrapper.find('td')).toHaveLength(2);
+    it('Tests that the component renders correctly two td elements within a tr element', () => {
+        const wrapper = shallow(<CourseListRow isHeader={false} textFirstCell={'Test'} textSecondCell={'Test'}/>);
+        expect(wrapper.find('tr td')).toHaveLength(2);
     });
 });
-

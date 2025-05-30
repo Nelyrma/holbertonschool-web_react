@@ -1,21 +1,28 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import WithLogging from './WithLogging';
+import Login from '../Login/Login';
 
-console.log = jest.fn();
-
-describe('WithLogging HOC', () => {
-  afterEach(() => {
-    console.log.mockClear();
-  });
-
-  it('logs on mount and unmount with the component name', () => {
-    const Login = () => <div>Login Component</div>;
-    Login.displayName = 'Login';
-    const ComponentWithLogging = WithLogging(Login);
-    const wrapper = shallow(<ComponentWithLogging />);
-    expect(console.log).toHaveBeenCalledWith('Component Login is mounted');
-    wrapper.unmount();
-    expect(console.log).toHaveBeenCalledWith('Component Login is going to unmount');
-  });
+describe('Tests the HOC WithLogging', () => {
+    let mockConsole;
+    beforeEach(() => {
+        mockConsole = jest.spyOn(console, 'log').mockImplementation(() => {});
+    });
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+    it('Makes sure WithLogging works fine when the wrapped element is pure html', () => {
+        const WrappedComponent = WithLogging(() => <p />);
+        const wrapper = shallow(<WrappedComponent />);
+        expect(mockConsole).toHaveBeenCalledWith('Component Component is mounted');
+        wrapper.unmount();
+        expect(mockConsole).toHaveBeenCalledWith('Component Component is going to unmount');
+    });
+    it('Makes sure WithLogging works fine when the wrapped element is Login', () => {
+        const WrappedComponent = WithLogging(Login);
+        const wrapper = shallow(<WrappedComponent />);
+        expect(mockConsole).toHaveBeenCalledWith('Component Login is mounted');
+        wrapper.unmount();
+        expect(mockConsole).toHaveBeenCalledWith('Component Login is going to unmount');
+    });
 });

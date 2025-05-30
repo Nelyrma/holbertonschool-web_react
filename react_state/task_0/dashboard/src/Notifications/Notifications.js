@@ -1,192 +1,143 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import closeIcon from '../assets/close-icon.png';
-import NotificationItem from './NotificationItem';
-import NotificationItemShape from './NotificationItemShape';
 import { StyleSheet, css } from 'aphrodite';
+import closeIcon from '../assets/close-icon.png';
+import NotificationItemShape from './NotificationItemShape';
+import NotificationItem from './NotificationItem';
 
-class Notifications extends Component {
+class Notifications extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      prevListLength: 0,
-      displayDrawer: true
-    };
     this.markAsRead = this.markAsRead.bind(this);
-    this.handleClick = this.handleClick.bind(this);
-    this.toggleDisplay = this.toggleDisplay.bind(this);
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.listNotifications.length > nextState.prevListLength;
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.listNotifications !== this.props.listNotifications) {
-      this.setState({
-        prevListLength: prevProps.listNotifications.length
-      });
-    }
   }
 
   markAsRead(id) {
     console.log(`Notification ${id} has been marked as read`);
   }
 
-  handleClick() {
-    console.log("Close button has been clicked");
-  }
-
-  toggleDisplay() {
-    this.setState(prevState => ({
-      displayDrawer: !prevState.displayDrawer
-    }));
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.displayDrawer !== nextProps.displayDrawer) return true;
+    if (this.props.listNotifications.length < nextProps.listNotifications.length) return true;
+    return false;
   }
 
   render() {
-    const { listNotifications } = this.props;
-    const { displayDrawer } = this.state;
-
+    const buttonStyle = {
+      background: 'transparent',
+      border: 'none',
+      position: "absolute",
+      top: 2,
+      right: 2
+    }
+    const menuItemStyle = css(this.props.displayDrawer ? styles.hidden : styles.menuItem);
+    let content;
+  
+    if (this.props.listNotifications.length === 0) content = <p>No new notification for now</p>;
+    else {
+      content = this.props.listNotifications.map((notification) =>
+      <NotificationItem key={notification.id} type={notification.type} value={notification.value} html={notification.html} markAsRead={this.markAsRead} id={notification.id}/>);
+    }
+    const { handleDisplayDrawer, handleHideDrawer } = this.props;
     return (
-      <div onClick={this.toggleDisplay}>
-        {displayDrawer ? (
-          <div className={css(styles.notifications)}>
-            <button className={css(styles.closeButton)}
-              aria-label="Close"
-              onClick={this.handleClick}
-            >
-              <img className={css(styles.closeButtonImg)} src={closeIcon} alt="Close icon" />
+      <>
+        <div className={menuItemStyle}>
+          <p onClick={handleDisplayDrawer}>Your notifications</p>
+        </div>
+        {this.props.displayDrawer ? (
+          <div className={css(styles.notifications, styles.small)} id="Notifications">
+            {this.props.listNotifications.length === 0 ? content : (<p>Here is the list of notifications</p>)}
+            <button aria-label='Close' onClick={handleHideDrawer} style={buttonStyle}>
+              <img src={closeIcon} alt='Close icon' width={10}/>
             </button>
-            <p>Here is the list of notifications</p>
-            <ul className={css(styles.notificationList)}>
-              {listNotifications && listNotifications.length > 0 ? (
-                listNotifications.map(notification => (
-                  <li
-                    key={notification.id}
-                    className={css(
-                      styles.notification,
-                      styles.listItem,
-                      notification.type === 'default' && styles.default,
-                      notification.type === 'urgent' && styles.urgent
-                    )}
-                  >
-                    <NotificationItem
-                      type={notification.type}
-                      value={notification.value}
-                      html={notification.html}
-                      markAsRead={() => this.markAsRead(notification.id)}
-                    />
-                  </li>
-                ))
-              ) : (
-                <NotificationItem type="default" value="No new notification for now" />
-              )}
-            </ul>
+            {this.props.listNotifications.length === 0 ? null : (<ul className={css(styles.noPadding)}>{content}</ul>)}
           </div>
-        ) : (
-          <p className={css(styles.notificationTitle)}>Your notifications</p>
-        )}
-      </div>
+        ) : null}
+      </>
     );
   }
 }
 
-const fadeInKeyframes = {
-  'from': {
-    opacity: 0.5,
+Notifications.propTypes = {
+  displayDrawer: PropTypes.bool,
+  listNotifications: PropTypes.arrayOf(NotificationItemShape),
+  handleDisplayDrawer: PropTypes.func,
+  handleHideDrawer: PropTypes.func
+};
+
+Notifications.defaultProps = {
+  displayDrawer: false,
+  listNotifications: [],
+  handleDisplayDrawer: () => {},
+  handleHideDrawer: () => {}
+};
+
+const opacityAnimationFrames = {
+  '0%': {
+      opacity: 0.5,
   },
-  'to': {
-    opacity: 1,
+    '100%': {
+      opacity: 1,
   },
 };
 
-const bounce = {
-  '0%, 100%': {
-    transform: 'translateY(0)',
+const bounceAnimationFrames = {
+  '0%': {
+      transform: 'translateY(0px)',
   },
   '50%': {
-    transform: 'translateY(-5px)',
+      transform: 'translateY(-5px)',
+  },
+  '100%': {
+      transform: 'translateY(5px)',
   },
 };
 
 const styles = StyleSheet.create({
-  notificationComponents: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  notificationTitle: {
+  menuItem: {
     textAlign: 'right',
-    opacity: 1,
-    transition: 'opacity 1s',
+    marginRight: '.5rem',
+    marginBottom: '.5rem',
+    background: '#fff8f8',
+    float: 'right',
     ':hover': {
-      opacity: 0.5,
-      animationName: [bounce, fadeInKeyframes],
-      animationDuration: '0.5s, 1s',
-      animationIterationCount: '3, 1',
       cursor: 'pointer',
+      animationName: [opacityAnimationFrames, bounceAnimationFrames],
+      animationDuration: '1s, 0.5s',
+      animationTimingFunction: 'ease-in-out',
+      animationIterationCount: '3',
     },
   },
+
+  hidden: {
+    display: 'none'
+  },
+
   notifications: {
-    border: '3px dashed #E1003C',
-    padding: '20px',
-    backgroundColor: 'white',
-    ':hover': {
-      backgroundColor: '#fff8f8',
-      cursor: 'pointer',
-    },
-    '@media (max-width: 600px)': {
+      position: 'absolute',
+      right: '1rem',
+      padding: '1rem',
+      width: '20rem',
+      border: 'dashed #e11d3f'
+  },
+  small: {
+    '@media (max-width: 900px)': {
+      padding: 0,
+      fontSize: 20,
       position: 'fixed',
       top: 0,
       left: 0,
       width: '100%',
-      height: '100vh',
-      zIndex: 4,
-      padding: 0,
+      height: '100%',
       border: 'none',
-    },
+      background: 'white',
+      zIndex: 10
+    }
   },
-  closeButton: {
-    float: 'right',
-    border: 'none',
-    cursor: 'pointer',
-    width: '20px',
-    height: '20px',
-    background: 'transparent',
-    ':hover': {
-      opacity: '0.5',
-      cursor: 'pointer',
-    },
-  },
-  closeButtonImg: {
-    width: '100%',
-  },
-  default: {
-    color: 'blue',
-  },
-  urgent: {
-    color: 'red',
-  },
-  notificationList: {
-    '@media (max-width: 600px)': {
-      margin: 0,
+  noPadding: {
+    '@media (max-width: 900px)': {
       padding: 0,
-      listStyle: 'none',
-    },
-  },
-  listItem: {
-    '@media (max-width: 600px)': {
-      borderBottom: '1px solid black',
-      padding: '10px 8px',
-      fontSize: '20px',
-    },
+    }
   },
 });
-
-Notifications.propTypes = {
-  listNotifications: PropTypes.arrayOf(NotificationItemShape),
-  displayDrawer: PropTypes.bool,
-  handleDisplayDrawer: PropTypes.func,
-  handleHideDrawer: PropTypes.func,
-};
 
 export default Notifications;
